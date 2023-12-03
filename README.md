@@ -57,7 +57,7 @@ docker run -d --init \
    -v ~/unifi:/unifi \
    --user unifi \
    --name unifi \
-   jacobalberty/unifi
+   ghcr.io/guymers/unifi:v7.5.176
 ```
 
 In a minute or two, (after Unifi Controller starts up) you can go to
@@ -119,47 +119,16 @@ to the directory `/unifi`inside the container.
 If you created the directory elsewhere, modify the `~/unifi` part of this option to match.
 See the [Volumes](#volumes) discussion for other volumes used by Unifi Controller.
 - `--user unifi` - Run as a non-root user. See the [Run as non-root User](#run-as-non-root-user) discussion below
-- `jacobalberty/unifi` - the name of the container to use.
-The `jacobalberty...` image is retrieved from [Dockerhub.](https://hub.docker.com/r/jacobalberty/unifi)
+- `guymers/unifi:<tag>` - the name of the container to use.
 The [Current Information](#current-information) section below discusses the versions/tags that are available.
 
 ## Current Information
 
-**The current "latest" version is Unifi Controller 7.5.176.
-There are currently no hot-fix or CVE warnings
-affecting Unifi Controller.**
+The latest version is Unifi Controller 7.5.176.
 
-You can choose the version of Unifi Controller in the `docker run ...` command.
-In Docker terminology, these versions are specified by "tags".
-
-For example, in this project the container named `jacobalberty/unifi`
-(with no "tag")
-provides the most recent stable release.
-The table below lists recent versions.
-
-The `rc` tag (for example, `jacobalberty/unifi:rc`)
-uses the most recent Release Candidate from the UniFi APT repository.
-
-You may also specify a version number (e.g., `jacobalberty/unifi:stable6`)
-to get a specific version number, as shown in the table below.
-
-_Note:_ In Docker, specifying an image with no tag 
-(e.g., `jacobalberty/unifi`) gets the "latest" tag.
-For Unifi-in-Docker, this uses the most recent stable version.
-
-| Tag | Description | Changelog |
-|-----|-------------|-----------|
-| [`latest` `v7.5.176`](https://github.com/jacobalberty/unifi-docker/blob/master/Dockerfile) | Current Stable: Version 7.5.176 as of 2023-09-15 |[Change Log 7.5.176](https://community.ui.com/releases/UniFi-Network-Application-7-5-176/0a224764-0603-4a8b-a038-1a7d59c6615c)|
-| [`rc`](https://github.com/jacobalberty/unifi-docker/blob/rc/Dockerfile) | Release Candidate: 7.2.92-rc as of 2022-07-29 | [Change Log 7.2.91-rc](https://community.ui.com/releases/UniFi-Network-Application-7-2-91/cdac73f0-7426-4276-ace8-8a96c656ba65) |
-| [`stable-6`](https://github.com/jacobalberty/unifi-docker/blob/stable-6/Dockerfile) | Final stable version 6 (6.5.55) | [Change Log 6.5.55](https://community.ui.com/releases/UniFi-Network-Application-6-5-55/48c64137-4a4a-41f7-b7e4-3bee505ae16e) |
-| [`stable-5`](https://github.com/jacobalberty/unifi-docker/blob/stable-5/Dockerfile) | Final stable version 5 (5.4.23) | [Change Log 5.14.23](https://community.ui.com/releases/UniFi-Network-Controller-5-14-23/daf90732-30ad-48ee-81e7-1dcb374eba2a) |
-
-### multiarch
-
-All available containers now support multiarch with `amd64`, `armhf`, and `arm64` builds included.
-`armhf` for now uses mongodb 3.4, I do not see much of a path forward for `armhf` due
-to the lack of mongodb support for 32 bit arm, but I will
-support it as long as feasibly possible, for now that date seems to be expiration of support for ubuntu 18.04.
+| Tag                                                                           | Changelog |
+|-------------------------------------------------------------------------------|------------|
+| [`v7.5.176`](https://github.com/guymers/unifi/blob/v7.5.176/Dockerfile) | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-7-5-176/0a224764-0603-4a8b-a038-1a7d59c6615c)|
 
 ## Adopting Access Points and Unifi Devices
 
@@ -177,10 +146,6 @@ To do this:
 * Check the "Enable" box, and enter the IP address of the Docker host machine. 
 * Save settings in Unifi Controller
 * Restart UniFi-in-Docker container with `docker stop ...` and `docker run ...` commands.
-
-See [Side Projects](https://github.com/jacobalberty/unifi-docker/blob/master/Side-Projects.md#other-techniques-for-adoption) for
-other techniques to get Unifi devices to adopt your
-new Unifi Controller.
 
 ## Volumes
 
@@ -201,14 +166,6 @@ You can place scripts you want to launch every time the container starts in here
 * `/var/run/unifi` 
 Run information, in general you will not need to touch this volume.
 It is there to ensure UniFi has a place to write its PID files
-
-### Legacy Volumes
-
-These are no longer actually volumes, rather they exist for legacy compatibility.
-You are urged to move to the new volumes ASAP.
-
-* `/var/lib/unifi` New name: `/unifi/data`
-* `/var/log/unifi` New name: `/unifi/log`
 
 ## Environment Variables:
 
@@ -341,13 +298,3 @@ You can check your certificate for this with the following command:
 ```
 
 If the output contains `id-ec` as shown in the example, then your certificate might be affected.
-
-## Additional Information
-
-This document describes everything you need to get Unifi-in-Docker running.
-The [Side Projects and Background Info](https://github.com/jacobalberty/unifi-docker/blob/master/Side-Projects.md) page
-provides more about what we've learned while developing Unifi-in-Docker.
-
-## TODO
-
-This list is empty for now, please [add your suggestions](https://github.com/jacobalberty/unifi-docker/issues).

@@ -1,76 +1,59 @@
-FROM golang:1.21-bullseye as permset
-WORKDIR /src
-RUN git clone https://github.com/jacobalberty/permset.git /src && \
-    mkdir -p /out && \
-    go build -ldflags "-X main.chownDir=/unifi" -o /out/permset
-
-FROM ubuntu:20.04
+FROM docker.io/library/ubuntu:20.04
 
 LABEL maintainer="Jacob Alberty <jacob.alberty@foundigital.com>"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG PKGURL=https://dl.ui.com/unifi/7.5.176/unifi_sysvinit_all.deb
-
 ENV BASEDIR=/usr/lib/unifi \
     DATADIR=/unifi/data \
     LOGDIR=/unifi/log \
-    CERTDIR=/unifi/cert \
     RUNDIR=/unifi/run \
-    ORUNDIR=/var/run/unifi \
-    ODATADIR=/var/lib/unifi \
-    OLOGDIR=/var/log/unifi \
-    CERTNAME=cert.pem \
-    CERT_PRIVATE_NAME=privkey.pem \
-    CERT_IS_CHAIN=false \
-    GOSU_VERSION=1.10 \
-    BIND_PRIV=true \
+    CERTDIR=/unifi/cert \
     RUNAS_UID0=true \
     UNIFI_GID=999 \
     UNIFI_UID=999
 
-# Install gosu
-# https://github.com/tianon/gosu/blob/master/INSTALL.md
-# This should be integrated with the main run because it duplicates a lot of the steps there
-# but for now while shoehorning gosu in it is seperate
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y gosu; \
-	rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      apt-transport-https \
+      ca-certificates \
+      curl \
+      dirmngr \
+      gpg \
+      gpg-agent \
+      tzdata \
+      gosu \
+      binutils \
+      ca-certificates-java \
+      libcap2 \
+      logrotate \
+      mongodb-server \
+      openjdk-17-jre-headless \
+  && echo 'deb [arch=amd64,arm64] https://www.ui.com/downloads/unifi/debian stable ubiquiti' | tee /etc/apt/sources.list.d/100-ubnt-unifi.list \
+  && apt-key adv --keyserver keyserver.ubuntu.com --recv 06E85760C0A52C50 \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /usr/unifi \
-     /usr/local/unifi/init.d \
-     /usr/unifi/init.d \
-     /usr/local/docker
+ARG PKGURL=https://dl.ui.com/unifi/7.5.176/unifi_sysvinit_all.deb
+
+RUN curl --retry 1 -L -o /tmp/unifi.deb "$PKGURL" \
+ && apt -y install /tmp/unifi.deb \
+ && rm -f /tmp/unifi.deb
+
+RUN set -ex \
+ && mkdir -p /unifi \
+ && rm -rf ${BASEDIR}/data ${BASEDIR}/logs ${BASEDIR}/run \
+ && mkdir -p ${DATADIR} ${LOGDIR} ${RUNDIR} \
+ && ln -s ${DATADIR} ${BASEDIR}/data \
+ && ln -s ${LOGDIR} ${BASEDIR}/logs \
+ && ln -s ${RUNDIR} ${BASEDIR}/run \
+ && mkdir -p /var/cert ${CERTDIR} \
+ && ln -s ${CERTDIR} /var/cert/unifi \
+ && chown unifi:unifi -R /unifi
+
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY docker-healthcheck.sh /usr/local/bin/
-COPY docker-build.sh /usr/local/bin/
-COPY functions /usr/unifi/functions
-COPY import_cert /usr/unifi/init.d/
-COPY pre_build /usr/local/docker/pre_build
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
- && chmod +x /usr/unifi/init.d/import_cert \
- && chmod +x /usr/local/bin/docker-healthcheck.sh \
- && chmod +x /usr/local/bin/docker-build.sh \
- && chmod -R +x /usr/local/docker/pre_build
-
-# Push installing openjdk-8-jre first, so that the unifi package doesn't pull in openjdk-7-jre as a dependency? Else uncomment and just go with openjdk-7.
-RUN set -ex \
- && mkdir -p /usr/share/man/man1/ \
- && groupadd -r unifi -g $UNIFI_GID \
- && useradd --no-log-init -r -u $UNIFI_UID -g $UNIFI_GID unifi \
- && /usr/local/bin/docker-build.sh "${PKGURL}"
-
-COPY --from=permset /out/permset /usr/local/bin/permset
-RUN chown 0.0 /usr/local/bin/permset && \
-    chmod +s /usr/local/bin/permset
-
-RUN mkdir -p /unifi && chown unifi:unifi -R /unifi
-
-# Apply any hotfixes that were included
-COPY hotfixes /usr/local/unifi/hotfixes
-
-RUN chmod +x /usr/local/unifi/hotfixes/* && run-parts /usr/local/unifi/hotfixes
+ && chmod +x /usr/local/bin/docker-healthcheck.sh 
 
 VOLUME ["/unifi", "${RUNDIR}"]
 
@@ -80,12 +63,5 @@ WORKDIR /unifi
 
 HEALTHCHECK --start-period=5m CMD /usr/local/bin/docker-healthcheck.sh || exit 1
 
-# execute controller using JSVC like original debian package does
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-
 CMD ["unifi"]
-
-# execute the conroller directly without using the service
-#ENTRYPOINT ["/usr/bin/java", "-Xmx${JVM_MAX_HEAP_SIZE}", "-jar", "/usr/lib/unifi/lib/ace.jar"]
-  # See issue #12 on github: probably want to consider how JSVC handled creating multiple processes, issuing the -stop instraction, etc. Not sure if the above ace.jar class gracefully handles TERM signals.
-#CMD ["start"]

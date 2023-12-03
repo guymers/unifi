@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
 
-. /usr/unifi/functions
-
-# Check that any included hotfixes have been properly applied and exit if not
-if ! validate; then
-  echo "Missing an included hotfix"
-  exit 1
-fi
-
-if [ -x /usr/local/bin/docker-build.sh ]; then
-    /usr/local/bin/docker-build.sh "${PKGURL}"
-fi
+log() {
+    echo "$(date +"[%Y-%m-%d %T,%3N]") <docker-entrypoint> $*"
+}
 
 exit_handler() {
     log "Exit signal received, shutting down"
@@ -31,6 +23,16 @@ exit_handler() {
 }
 
 trap 'kill ${!}; exit_handler' SIGHUP SIGINT SIGQUIT SIGTERM
+
+set_java_home() {
+    JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/jre/bin/java::")
+    if [ ! -d "${JAVA_HOME}" ]; then
+        # For some reason readlink failed so lets just make some assumptions instead
+        # We're assuming openjdk 8 since thats what we install in Dockerfile
+        arch=`dpkg --print-architecture 2>/dev/null`
+        JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${arch}
+  fi
+}
 
 [ "x${JAVA_HOME}" != "x" ] || set_java_home
 
@@ -161,13 +163,8 @@ fi
 
 UNIFI_CMD="java ${JVM_OPTS} -jar ${BASEDIR}/lib/ace.jar start"
 
-if [ "$EUID" -ne 0 ] && command -v permset &> /dev/null
-then
-  permset
-fi
-
 # controller writes to relative path logs/server.log
-cd ${BASEDIR}
+cd "${BASEDIR}"
 
 CUID=$(id -u)
 
@@ -176,9 +173,6 @@ if [[ "${@}" == "unifi" ]]; then
     log 'Starting unifi controller service.'
     for dir in "${DATADIR}" "${LOGDIR}"; do
         if [ ! -d "${dir}" ]; then
-            if [ "${UNSAFE_IO}" == "true" ]; then
-                rm -rf "${dir}"
-            fi
             mkdir -p "${dir}"
         fi
     done
@@ -191,16 +185,6 @@ if [[ "${@}" == "unifi" ]]; then
         fi
         ${UNIFI_CMD} &
     elif [ "${RUNAS_UID0}" == "false" ]; then
-        if [ "${BIND_PRIV}" == "true" ]; then
-            if setcap 'cap_net_bind_service=+ep' "${JAVA_HOME}/bin/java"; then
-                sleep 1
-            else
-                log "ERROR: setcap failed, can not continue"
-                log "ERROR: You may either launch with -e BIND_PRIV=false and only use ports >1024"
-                log "ERROR: or run this container as root with -e RUNAS_UID0=true"
-                exit 1
-            fi
-        fi
         if [ "$(id unifi -u)" != "${UNIFI_UID}" ] || [ "$(id unifi -g)" != "${UNIFI_GID}" ]; then
             log "INFO: Changing 'unifi' UID to '${UNIFI_UID}' and GID to '${UNIFI_GID}'"
             usermod -o -u ${UNIFI_UID} unifi && groupmod -o -g ${UNIFI_GID} unifi
