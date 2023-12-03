@@ -2,8 +2,6 @@
 
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-. /usr/unifi/functions
-
 if [[ ! -d "${CERTDIR}" || ! -f "${CERTDIR}/${CERTNAME}" ]]; then
     exit 0
 fi
@@ -76,7 +74,7 @@ _EOF
     else
         awk 1 "${CERTDIR}/chain.pem" "${CERTDIR}/${CERTNAME}" >> "${CHAIN}"
     fi
-   openssl pkcs12 -export  -passout pass:aircontrolenterprise \
+    openssl pkcs12 -export  -passout pass:aircontrolenterprise \
         -in "${CHAIN}" \
         -inkey "${CERTDIR}/${CERT_PRIVATE_NAME}" \
         -out "${TEMPFILE}" -name unifi
