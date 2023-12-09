@@ -51,7 +51,7 @@ docker run -d --init \
    -v ~/unifi/run:/unifi/run \
    --user unifi \
    --name unifi \
-   ghcr.io/guymers/unifi:v7.5.187
+   ghcr.io/guymers/unifi:v8.0.7
 ```
 
 In a minute or two, (after Unifi Controller starts up) you can go to
@@ -118,12 +118,13 @@ The [Current Information](#current-information) section below discusses the vers
 
 ## Current Information
 
-The latest version is Unifi Controller 7.5.187.
+The latest version is Unifi Controller 8.0.7.
 
-| Tag                                                                           | Changelog |
-|-------------------------------------------------------------------------------|------------|
-| [`v7.5.187`](https://github.com/guymers/unifi/blob/v7.5.187/Dockerfile) | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-7-5-187/408b64c5-a485-4a37-843c-31e87140be64)|
-| [`v7.5.176`](https://github.com/guymers/unifi/blob/v7.5.176/Dockerfile) | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-7-5-176/0a224764-0603-4a8b-a038-1a7d59c6615c)|
+| Tag                                                                        | Changelog |
+|----------------------------------------------------------------------------|------------|
+| [`v8.0.7`](https://github.com/guymers/unifi/blob/v8.0.7/Dockerfile) | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-8-0-7/7818b9df-4845-4c82-ba3c-1218e61010d4)|
+| [`v7.5.187`](https://github.com/guymers/unifi/blob/v7.5.187/Dockerfile)    | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-7-5-187/408b64c5-a485-4a37-843c-31e87140be64)|
+| [`v7.5.176`](https://github.com/guymers/unifi/blob/v7.5.176/Dockerfile)    | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-7-5-176/0a224764-0603-4a8b-a038-1a7d59c6615c)|
 
 ## Adopting Access Points and Unifi Devices
 
