@@ -2,27 +2,21 @@
 
 This repo contains a Dockerized version of [Ubiqiti Network's](https://www.ubnt.com/) Unifi Controller.
 
-**Why bother?** Using Docker, you can stop worrying about version
-hassles and update notices for
-Unifi Controller, Java, _or_ your OS.
+**Why bother?** Using Docker, you can stop worrying about version hassles and update notices for Unifi Controller, Java, _or_ your OS.
 A Docker container wraps everything into one well-tested bundle.
 
 To install, a couple lines on the command-line starts the container.
 To upgrade, just stop the old container, and start up the new.
 It's really that simple.
 
-See the [Current Information](#Current-information) section for the latest versions.
+The latest version is Unifi Controller v8.1.127 [Change Log](https://community.ui.com/releases/UniFi-Network-Application-8-1-127/571d2218-216c-4769-a292-796cff379561)
 
 ## Setting up, Running, Stopping, Upgrading
 
-First, install Docker on the "Docker host" -
-the machine that will run the Docker
-and Unifi Controller software.
+First, install Docker on the "Docker host" - the machine that will run the Docker and Unifi Controller software.
 Use any of the guides on the internet to install on your Docker host.
-For Windows, see the [Microsoft guide for installing Docker.](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-containers)
 
-Then use the following steps to set up the directories
-and start the Docker container running.
+Then use the following steps to set up the directories and start the Docker container running.
 
 ### Setting up directories
 
@@ -36,7 +30,7 @@ mkdir -p unifi/log
 mkdir -p unifi/run
 ```
 
-### Running Unifi-in-Docker
+### Running
 
 Each time you want to start Unifi, use this command.
 Each of the options is [described below.](#options-on-the-command-line)
@@ -51,7 +45,7 @@ docker run -d --init \
    -v ~/unifi/run:/unifi/run \
    --user unifi \
    --name unifi \
-   ghcr.io/guymers/unifi:v8.0.26
+   ghcr.io/guymers/unifi:v8.1.127
 ```
 
 In a minute or two, (after Unifi Controller starts up) you can go to
@@ -60,36 +54,20 @@ to complete configuration from the web (initial install) or resume using Unifi C
 
 **Important:** Two points to be aware of when you're setting up your Unifi Controller:
 
-* When your browser initially connects to the link above, you will
-see a warning about an untrusted certificate.
-If you are _certain_ that you have typed the address of the
-Docker host correctly, agree to the connection.
-* See the note below about **Override "Inform Host" IP** so your
-Unifi devices can "find" the Unifi Controller.
+* When your browser initially connects to the link above, you will see a warning about an untrusted certificate.
+If you are _certain_ that you have typed the address of the Docker host correctly, agree to the connection.
+* See the note below about **Override "Inform Host" IP** so your Unifi devices can "find" the Unifi Controller.
  
-### Stopping Unifi-in-Docker
-
-To change options, stop the Docker container then re-run the `docker run...` command
-above with the new options.
-_Note:_ The `docker rm unifi` command simply removes the "name" from the previous Docker image.
-No time-consuming rebuild is required.
-
-```bash
-docker stop unifi
-docker rm unifi
-```
 ### Upgrading Unifi Controller
 
-All the configuration and other files created by Unifi Controller
-are stored on the Docker host's local disk (`~/unifi` by default.)
+All the configuration and other files created by Unifi Controller are stored on the Docker host's local disk (`~/unifi` by default.)
 No information is retained within the container.
-An upgrade to a new version of Unifi Controller simply retrieves a new Docker container,
-which then re-uses the configuration from the local disk.
+An upgrade to a new version of Unifi Controller simply retrieves a new Docker container, which then re-uses the configuration from the local disk.
 The upgrade process is:
 
 1. **MAKE A BACKUP** on another computer, not the Docker host _(Always, every time...)_
 2. Stop the current container (see above)
-3. Enter `docker run...` with the newer container tag (see [Current Information](#current-information) section below.)
+3. Enter `docker run...` with the newer container tag
 
 ## Options on the Command Line
 
@@ -114,18 +92,6 @@ If you created the directory elsewhere, modify the `~/unifi` part of this option
 See the [Volumes](#volumes) discussion for other volumes used by Unifi Controller.
 - `--user unifi` - Run as a non-root user
 - `guymers/unifi:<tag>` - the name of the container to use.
-The [Current Information](#current-information) section below discusses the versions/tags that are available.
-
-## Current Information
-
-The latest version is Unifi Controller 8.0.26
-
-| Tag                                                                        | Changelog |
-|----------------------------------------------------------------------------|------------|
-| [`v8.0.26`](https://github.com/guymers/unifi/blob/v8.0.26/Dockerfile) | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-8-0-26/cd9303a8-f26a-44e2-94d8-a3cac8606726)|
-| [`v8.0.7`](https://github.com/guymers/unifi/blob/v8.0.7/Dockerfile) | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-8-0-7/7818b9df-4845-4c82-ba3c-1218e61010d4)|
-| [`v7.5.187`](https://github.com/guymers/unifi/blob/v7.5.187/Dockerfile)    | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-7-5-187/408b64c5-a485-4a37-843c-31e87140be64)|
-| [`v7.5.176`](https://github.com/guymers/unifi/blob/v7.5.176/Dockerfile)    | [Change Log](https://community.ui.com/releases/UniFi-Network-Application-7-5-176/0a224764-0603-4a8b-a038-1a7d59c6615c)|
 
 ## Adopting Access Points and Unifi Devices
 
