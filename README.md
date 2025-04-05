@@ -9,7 +9,7 @@ To install, a couple lines on the command-line starts the container.
 To upgrade, just stop the old container, and start up the new.
 It's really that simple.
 
-The latest version is Unifi Controller v9.0.108 [Change Log](https://community.ui.com/releases/UniFi-Network-Application-9-0-108/4e4c885a-311f-41b1-ad5d-9b6afcee77f7)
+The latest version is Unifi Controller v9.0.114 [Change Log](https://community.ui.com/releases/UniFi-Network-Application-9-0-114/35b6e9ac-f63d-46c9-bbbe-74a4a61ac95f)
 
 ## Setting up, Running, Stopping, Upgrading
 
@@ -45,7 +45,7 @@ docker run -d --init \
    -v ~/unifi/run:/unifi/run \
    --user unifi \
    --name unifi \
-   ghcr.io/guymers/unifi:v9.0.108
+   ghcr.io/guymers/unifi:v9.0.114
 ```
 
 In a minute or two, (after Unifi Controller starts up) you can go to
