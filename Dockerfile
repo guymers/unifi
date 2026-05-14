@@ -1,6 +1,6 @@
 FROM docker.io/library/ubuntu:20.04
 
-ARG PKGURL=https://dl.ui.com/unifi/9.5.21/unifi_sysvinit_all.deb
+ARG PKGURL=https://dl.ui.com/unifi/10.0.160/unifi_sysvinit_all.deb
 
 ARG DEBIAN_FRONTEND=noninteractive
 
