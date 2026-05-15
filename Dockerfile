@@ -18,19 +18,25 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       apt-transport-https \
       ca-certificates \
-      curl \
       dirmngr \
       gpg \
       gpg-agent \
+  && apt-key adv --keyserver keyserver.ubuntu.com --recv 68818C72E52529D4 \
+  && echo "deb [trusted=yes arch=amd64] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org.list \
+  && apt-key adv --keyserver keyserver.ubuntu.com --recv 06E85760C0A52C50 \
+  && echo 'deb [arch=amd64,arm64] https://www.ui.com/downloads/unifi/debian stable ubiquiti' | tee /etc/apt/sources.list.d/unifi.list \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      curl \
       tzdata \
       binutils \
       ca-certificates-java \
       libcap2 \
       logrotate \
-      mongodb-server \
+      mongodb-org \
       openjdk-17-jre-headless \
-  && echo 'deb [arch=amd64,arm64] https://www.ui.com/downloads/unifi/debian stable ubiquiti' | tee /etc/apt/sources.list.d/100-ubnt-unifi.list \
-  && apt-key adv --keyserver keyserver.ubuntu.com --recv 06E85760C0A52C50 \
   && rm -rf /var/lib/apt/lists/*
 
 RUN curl --retry 1 -L -o /tmp/unifi.deb "$PKGURL" \
