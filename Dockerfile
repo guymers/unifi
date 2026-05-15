@@ -21,8 +21,8 @@ RUN apt-get update \
       dirmngr \
       gpg \
       gpg-agent \
-  && apt-key adv --keyserver keyserver.ubuntu.com --recv 68818C72E52529D4 \
-  && echo "deb [trusted=yes arch=amd64] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org.list \
+  && apt-key adv --keyserver keyserver.ubuntu.com --recv 4B7C549A058F8B6B \
+  && echo "deb [trusted=yes arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org.list \
   && apt-key adv --keyserver keyserver.ubuntu.com --recv 06E85760C0A52C50 \
   && echo 'deb [arch=amd64,arm64] https://www.ui.com/downloads/unifi/debian stable ubiquiti' | tee /etc/apt/sources.list.d/unifi.list \
   && rm -rf /var/lib/apt/lists/*
