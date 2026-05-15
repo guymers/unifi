@@ -1,6 +1,6 @@
 FROM docker.io/library/ubuntu:20.04
 
-ARG PKGURL=https://dl.ui.com/unifi/10.0.160/unifi_sysvinit_all.deb
+ARG PKGURL=https://dl.ui.com/unifi/10.1.89/unifi_sysvinit_all.deb
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -21,10 +21,11 @@ RUN apt-get update \
       dirmngr \
       gpg \
       gpg-agent \
-  && apt-key adv --keyserver keyserver.ubuntu.com --recv 656408E390CFB1F5 \
-  && echo "deb [arch=amd64,arm64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org.list \
-  && apt-key adv --keyserver keyserver.ubuntu.com --recv 06E85760C0A52C50 \
-  && echo 'deb [arch=amd64,arm64] https://www.ui.com/downloads/unifi/debian stable ubiquiti' | tee /etc/apt/sources.list.d/unifi.list \
+      wget \
+  && wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null \
+  && echo 'deb https://packages.adoptium.net/artifactory/deb focal main' | tee /etc/apt/sources.list.d/adoptium.list \
+  && wget -qO - https://pgp.mongodb.com/server-4.4.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/mongodb-4.4.gpg > /dev/null \
+  && echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list \
   && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update \
@@ -36,7 +37,7 @@ RUN apt-get update \
       libcap2 \
       logrotate \
       mongodb-org \
-      openjdk-17-jre-headless \
+      temurin-25-jre \
   && rm -rf /var/lib/apt/lists/*
 
 RUN curl --retry 1 -L -o /tmp/unifi.deb "$PKGURL" \
